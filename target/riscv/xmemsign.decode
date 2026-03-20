@@ -1,0 +1,10 @@
+# 12-bit unsigned immediate
+%imm_u    20:12
+
+&memsign rd rs1 imm
+
+@custom ............ rs1:5 ... rd:5 ....... &memsign imm=%imm_u
+
+# custom-0 opcode (0001011)
+msign     ............ ..... 000 ..... 0001011 @custom
+mverify   ............ ..... 001 ..... 0001011 @custom
