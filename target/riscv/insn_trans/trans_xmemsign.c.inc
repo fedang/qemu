@@ -7,11 +7,13 @@
 static bool trans_msign(DisasContext *ctx, arg_memsign *a)
 {
     REQUIRE_XMEMSIGN(ctx);
-    return false;
+    qemu_log("DEBUG: Decoding MSIGN\n");
+    return true;
 }
 
 static bool trans_mverify(DisasContext *ctx, arg_memsign *a)
 {
     REQUIRE_XMEMSIGN(ctx);
-    return false;
+    qemu_log("DEBUG: Decoding MVERIFY\n");
+    return true;
 }
