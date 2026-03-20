@@ -31,6 +31,12 @@ riscv_ss.add(files(
   'vcrypto_helper.c'
 ))
 
+# Add Ascon files
+riscv_ss.add(files(
+  'asconmacv13/permutations.c',
+  'asconmacv13/prf.c'
+))
+
 riscv_system_ss = ss.source_set()
 riscv_system_ss.add(files(
   'arch_dump.c',

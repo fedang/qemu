@@ -782,54 +782,51 @@ done:
 
 #endif /* !CONFIG_USER_ONLY */
 
+#include "asconmacv13/crypto_auth.h"
+#include "asconmacv13/api.h"
+
+static target_ulong ascon_memsign(CPURISCVState *env, target_ulong mem,
+                                  target_ulong len, uintptr_t ra)
+{
+    uint8_t buffer[4096] QEMU_ALIGNED(8);
+
+    for (target_ulong i = 0; i < len; i += 8) {
+        uint64_t data_quad = cpu_ldq_data_ra(env, mem + i, ra);
+        stq_he_p(buffer + i, data_quad);
+    }
+
+    uint8_t key[16];
+    stq_le_p(key, env->msignkey);
+    stq_le_p(key + 8, (uint64_t)mem);
+
+    uint8_t out[CRYPTO_BYTES];
+    crypto_auth(out, buffer, len, key);
+
+    target_ulong mask = env->msigncfg & 0x1
+                      ? 0x00FFFFFFFFFFFFFFULL
+                      : 0xFFFFFFFFFFFFFFFFULL;
+
+    return ldq_le_p(out) & mask;
+}
+
 target_ulong helper_msign(CPURISCVState *env, target_ulong mem,
                           target_ulong len)
 {
-    uintptr_t ra = GETPC();
-
-    uint8_t buffer[1 << 12];
-    for (target_ulong i = 0; i < len; i++) {
-        uint8_t data_byte = cpu_ldub_data_ra(env, mem + i, ra);
-        buffer[i] = data_byte;
-    }
-
-    target_ulong key = env->msignkey;
-    //target_ulong cfg = env->msigncfg;
-
-    // DUMMY
-    target_ulong state = key;
-    for (target_ulong i = 0; i < len; i++) {
-        state += buffer[i];
-    }
+    target_ulong sign = ascon_memsign(env, mem, len, GETPC());
 
     qemu_log("EXEC msign: mem=0x%lx, len=%ld, sign=0x%lx\n",
-             mem, len, state);
+             mem, len, sign);
 
-    return state;
+    return sign;
 }
 
 target_ulong helper_mverify(CPURISCVState *env, target_ulong mem,
-                            target_ulong len, target_ulong sig)
+                            target_ulong len, target_ulong old_sig)
 {
-    uintptr_t ra = GETPC();
-
-    uint8_t buffer[1 << 12];
-    for (target_ulong i = 0; i < len; i++) {
-        uint8_t data_byte = cpu_ldub_data_ra(env, mem + i, ra);
-        buffer[i] = data_byte;
-    }
-
-    target_ulong key = env->msignkey;
-    //target_ulong cfg = env->msigncfg;
-
-    // DUMMY
-    target_ulong state = key;
-    for (target_ulong i = 0; i < len; i++) {
-        state += buffer[i];
-    }
+    target_ulong sign = ascon_memsign(env, mem, len, GETPC());
 
     qemu_log("EXEC mverify: mem=0x%lx, len=%ld, new_sig=0x%lx, sig=0x%lx\n",
-             mem, len, state, sig);
+             mem, len, sign, old_sig);
 
-    return state == sig;
+    return (sign == old_sig) ? 1 : 0;
 }
