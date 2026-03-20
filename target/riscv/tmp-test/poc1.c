@@ -22,7 +22,8 @@
 void print_msg(const char *msg)
 {
     int len = 0;
-    while (*msg++) len++;
+    while (msg[len])
+        len++;
 
     register long a0 asm("a0") = 1;      // STDOUT
     register long a1 asm("a1") = (long)msg;

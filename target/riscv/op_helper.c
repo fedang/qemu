@@ -781,3 +781,49 @@ done:
 }
 
 #endif /* !CONFIG_USER_ONLY */
+
+target_ulong helper_msign(CPURISCVState *env, target_ulong mem,
+                          target_ulong len)
+{
+    uintptr_t ra = GETPC();
+
+    uint8_t buffer[1 << 12];
+    for (target_ulong i = 0; i < len; i++) {
+        uint8_t data_byte = cpu_ldub_data_ra(env, mem + i, ra);
+        buffer[i] = data_byte;
+    }
+
+    target_ulong key = env->msignkey;
+    //target_ulong cfg = env->msigncfg;
+
+    // DUMMY
+    target_ulong state = key;
+    for (target_ulong i = 0; i < len; i++) {
+        state += buffer[i];
+    }
+
+    return state;
+}
+
+target_ulong helper_mverify(CPURISCVState *env, target_ulong mem,
+                            target_ulong len, target_ulong sig)
+{
+    uintptr_t ra = GETPC();
+
+    uint8_t buffer[1 << 12];
+    for (target_ulong i = 0; i < len; i++) {
+        uint8_t data_byte = cpu_ldub_data_ra(env, mem + i, ra);
+        buffer[i] = data_byte;
+    }
+
+    target_ulong key = env->msignkey;
+    //target_ulong cfg = env->msigncfg;
+
+    // DUMMY
+    target_ulong state = key;
+    for (target_ulong i = 0; i < len; i++) {
+        state += buffer[i];
+    }
+
+    return state == sig;
+}

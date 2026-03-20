@@ -1289,3 +1289,7 @@ DEF_HELPER_4(vsm4r_vs, void, ptr, ptr, env, i32)
 #ifndef CONFIG_USER_ONLY
 DEF_HELPER_1(ssamoswap_disabled, void, env)
 #endif
+
+/* Memsign Extension */
+DEF_HELPER_3(msign, tl, env, tl, tl)
+DEF_HELPER_4(mverify, tl, env, tl, tl, tl)
