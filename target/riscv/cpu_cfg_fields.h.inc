@@ -176,5 +176,8 @@ TYPED_FIELD(uint32_t, pmp_granularity, 0)
 
 TYPED_FIELD(int8_t, max_satp_mode, -1)
 
+/* EXPERIMENTAL EXTENSION */
+BOOL_FIELD(ext_xmemsign)
+
 #undef BOOL_FIELD
 #undef TYPED_FIELD
