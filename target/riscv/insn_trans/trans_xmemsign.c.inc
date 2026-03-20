@@ -4,9 +4,17 @@
     }                                  \
 } while (0)
 
+#define REQUIRE_VALIDLEN(a) do {     \
+    if (a->imm == 0 || (a->imm % 8) != 0) { \
+        return false;                  \
+    }                                  \
+} while (0)
+
 static bool trans_msign(DisasContext *ctx, arg_memsign *a)
 {
     REQUIRE_XMEMSIGN(ctx);
+
+    REQUIRE_VALIDLEN(a);
 
     /* Get the pointer and length of the target memory */
     TCGv src_mem = get_gpr(ctx, a->rs1, EXT_NONE);
@@ -23,6 +31,8 @@ static bool trans_msign(DisasContext *ctx, arg_memsign *a)
 static bool trans_mverify(DisasContext *ctx, arg_memsign *a)
 {
     REQUIRE_XMEMSIGN(ctx);
+
+    REQUIRE_VALIDLEN(a);
 
     /* Get the pointer and length of the target memory */
     TCGv src_mem = get_gpr(ctx, a->rs1, EXT_NONE);

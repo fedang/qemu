@@ -39,12 +39,20 @@ void sys_exit(int code)
     asm volatile ("ecall" : "+r"(a0) : "r"(a7) : "memory");
 }
 
+static char test_mem[0x20];
+
+void check(uint64_t sign)
+{
+    mverify(sign, test_mem, sizeof(test_mem));
+
+    if (sign)
+        print_msg("Signature verified\n");
+    else
+        print_msg("Signature failed\n");
+}
+
 void _start()
 {
-    char buf[0x20];
-    for (int i = 0; i < sizeof(buf); i++)
-        buf[i] = 0xba;
-
     uint64_t key = 0xDEADBEEFCAFEBABE;
     write_msignkey(key);
 
@@ -52,15 +60,15 @@ void _start()
     write_msigncfg(cfg);
 
     uint64_t sign_val = 0;
-    msign(sign_val, &buf, sizeof(buf));
+    msign(sign_val, test_mem, sizeof(test_mem));
 
-    uint64_t tmp = sign_val;
-    mverify(tmp, &buf, sizeof(buf));
+    // This should pass
+    check(sign_val);
 
-    if (tmp)
-        print_msg("Verified\n");
-    else
-        print_msg("Failed\n");
+    test_mem[0] = 0xcc;
+
+    // This should fail
+    check(sign_val);
 
     sys_exit(0);
 }
