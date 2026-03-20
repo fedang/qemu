@@ -5784,11 +5784,53 @@ bool riscv_csr_is_vpu(int csrno)
     return csr_ops[csrno].predicate == vs;
 }
 
+/* Memsign Extension */
+static RISCVException msign(CPURISCVState *env, int csrno)
+{
+    if (!env_archcpu(env)->cfg.ext_xmemsign) {
+        return RISCV_EXCP_ILLEGAL_INST;
+    }
+
+    return RISCV_EXCP_NONE;
+}
+
+static RISCVException read_msignkey(CPURISCVState *env, int csrno,
+                                    target_ulong *val)
+{
+    *val = env->msignkey;
+    return RISCV_EXCP_NONE;
+}
+
+static RISCVException write_msignkey(CPURISCVState *env, int csrno,
+                                     target_ulong val, uintptr_t ra)
+{
+    env->msignkey = val;
+    return RISCV_EXCP_NONE;
+}
+
+static RISCVException read_msigncfg(CPURISCVState *env, int csrno,
+                                    target_ulong *val)
+{
+    *val = env->msigncfg;
+    return RISCV_EXCP_NONE;
+}
+
+static RISCVException write_msigncfg(CPURISCVState *env, int csrno,
+                                     target_ulong val, uintptr_t ra)
+{
+    env->msigncfg = val;
+    return RISCV_EXCP_NONE;
+}
+
 /*
  * Control and Status Register function table
  * riscv_csr_operations::predicate() must be provided for an implemented CSR
  */
 riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+    /* Mesign CSRs */
+    [CSR_MSIGN_KEY] = { "msignkey", msign, read_msignkey,  write_msignkey },
+    [CSR_MSIGN_CFG] = { "msigncfg", msign, read_msigncfg,  write_msigncfg },
+
     /* User Floating-Point CSRs */
     [CSR_FFLAGS]   = { "fflags",   fs,     read_fflags,  write_fflags },
     [CSR_FRM]      = { "frm",      fs,     read_frm,     write_frm    },

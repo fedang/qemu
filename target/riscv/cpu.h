@@ -508,6 +508,9 @@ struct CPUArchState {
     uint64_t rnmip;
     uint64_t rnmi_irqvec;
     uint64_t rnmi_excpvec;
+
+    uint64_t msignkey;
+    uint64_t msigncfg;
 };
 
 /*

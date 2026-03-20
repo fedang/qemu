@@ -607,6 +607,10 @@
 /* Zcmt Extension */
 #define CSR_JVT             0x017
 
+/* Memsign Extension */
+#define CSR_MSIGN_KEY       0x9c0
+#define CSR_MSIGN_CFG       0x9c1
+
 /* mstatus CSR bits */
 #define MSTATUS_UIE         0x00000001
 #define MSTATUS_SIE         0x00000002
