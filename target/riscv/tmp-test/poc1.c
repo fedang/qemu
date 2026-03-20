@@ -17,7 +17,7 @@
     asm volatile (".insn i 0x0B, 0, %0, %1, %2" : "=r"(rd) : "r"(rs1), "i"(imm))
 
 #define mverify(rd, rs1, imm) \
-    asm volatile (".insn i 0x0B, 1, %0, %1, %2" : "=r"(rd) : "r"(rs1), "i"(imm))
+    asm volatile (".insn i 0x0B, 1, %0, %1, %2" : "+r"(rd) : "r"(rs1), "i"(imm))
 
 void print_msg(const char *msg)
 {

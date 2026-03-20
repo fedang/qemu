@@ -802,6 +802,9 @@ target_ulong helper_msign(CPURISCVState *env, target_ulong mem,
         state += buffer[i];
     }
 
+    qemu_log("EXEC msign: mem=0x%lx, len=%ld, sign=0x%lx\n",
+             mem, len, state);
+
     return state;
 }
 
@@ -824,6 +827,9 @@ target_ulong helper_mverify(CPURISCVState *env, target_ulong mem,
     for (target_ulong i = 0; i < len; i++) {
         state += buffer[i];
     }
+
+    qemu_log("EXEC mverify: mem=0x%lx, len=%ld, new_sig=0x%lx, sig=0x%lx\n",
+             mem, len, state, sig);
 
     return state == sig;
 }
